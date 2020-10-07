@@ -55,11 +55,11 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
-#Lighting isue with github
-*LightingData.asset
+
 
 # Crashlytics generated file
 crashlytics-build.properties
 
 
 
+BaseProject_TANKS/Assets/Scenes/Main/LightingData.asset
