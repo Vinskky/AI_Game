@@ -23,11 +23,34 @@ public class TankMovement : MonoBehaviour
     private float m_TurnInputValue;        
     private float m_OriginalPitch;
 
+    //Public varuables for using SteeringSeek
+    [Header("Seek Parameters")]
+    public float stopDistance = 2.0f;
+    public float slowDistance = 4.0f;
+    public float maxTurnSpeed = 5.0f;
+    public float maxSpeed = 5.0f;
+    public float acceleration = 2.0f;
+    public float turnAcceleration = 2.0f;
+
+    //Public varuables for using SteeringSeek
+    [Header("Wander Parameters")]
+    public float wanderRadius = 2f;
+    public float wanderOffset = 3f;
 
     //Variables for using path using waypoints.
-    public Transform[] waypoints;
+    private Transform[] waypoints;
     private int destPoint = 0;
     private NavMeshAgent agent;
+
+    //Private variables for using SteeringSeek
+    private float turnSpeed;
+    private float movSpeed;
+    private Quaternion rotation;
+    private Vector3 movement;
+    private Vector3 position;
+    private Quaternion rot;
+    private Vector3 wTarget;
+    private int n = 0;
 
     private void Awake()
     {
@@ -78,6 +101,9 @@ public class TankMovement : MonoBehaviour
         else if (this.m_PlayerNumber == 2)
         {
             //code for movement using wander
+            position = transform.position;
+            Wander();
+            Move();
         }
 
         /*m_MovementAxisName = "Vertical" + m_PlayerNumber;
@@ -103,7 +129,7 @@ public class TankMovement : MonoBehaviour
     {
         // Play the correct audio clip based on whether or not the tank is moving and what audio is currently playing.
 
-        if(Mathf.Abs (m_MovementInputValue) < 0.1f && Mathf.Abs(m_TurnInputValue) < 0.1f)
+        if(Mathf.Abs(transform.position.x - agent.destination.x) < stopDistance && Mathf.Abs(transform.position.z - agent.destination.z) < stopDistance)
         {
             if(m_MovementAudio.clip == m_EngineDriving)
             {
@@ -144,6 +170,10 @@ public class TankMovement : MonoBehaviour
         else if(this.m_PlayerNumber == 2)
         {
             //code for movement using wander
+            if (Vector3.Distance(wTarget, position) < stopDistance)
+                Wander();
+
+            SteeringSeek(wTarget);
         }
          
 
@@ -176,5 +206,59 @@ public class TankMovement : MonoBehaviour
 
         destPoint = (destPoint + 1) % waypoints.Length;
 
+    }
+
+    void Wander() //
+    {
+        Vector3 localTarget = new Vector3(UnityEngine.Random.Range(-1.0f, 1.0f), 0, UnityEngine.Random.Range(-1.0f, 1.0f));
+        localTarget.Normalize();
+        localTarget *= wanderRadius;
+        localTarget += new Vector3(0, 0, wanderOffset);
+        Vector3 worldTarget = transform.TransformPoint(localTarget);
+        worldTarget.y = 0f;
+
+        wTarget = worldTarget;
+    }
+
+    void SteeringSeek(Vector3 targetPos)
+    {
+        if (Vector3.Distance(targetPos, position) < stopDistance)
+            return;
+
+        if (n % 5 == 0)
+            Seek(targetPos);
+
+        turnSpeed += turnAcceleration * Time.deltaTime;
+        turnSpeed = Mathf.Min(turnSpeed, maxTurnSpeed);
+
+        if (Vector3.Distance(targetPos, position) < slowDistance)
+        {
+            movSpeed = (maxSpeed * Vector3.Distance(targetPos, position)) / slowDistance;
+        }
+        else
+        {
+            movSpeed += acceleration * Time.deltaTime;
+            movSpeed = Mathf.Min(movSpeed, maxSpeed);
+        }
+
+        rot = Quaternion.Slerp(rot, rotation, Time.deltaTime * turnSpeed);
+        position += transform.forward.normalized * movSpeed * Time.deltaTime;
+
+        if (n % 5 == 0)
+        {
+            agent.destination = position;
+            transform.rotation = rot;
+        }
+
+    }
+
+    void Seek(Vector3 targetPos)
+    {
+
+        Vector3 direction = targetPos - position;
+        direction.y = 0f;
+        movement = direction.normalized * acceleration;
+        float angle = Mathf.Rad2Deg * Mathf.Atan2(movement.x, movement.z);
+        rotation = Quaternion.AngleAxis(angle, Vector3.up);
     }
 }
