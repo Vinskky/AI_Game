@@ -2,6 +2,8 @@
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.AI; // navmesh
+using System.Linq; // sort array for waypoints
 
 public class TankMovement : MonoBehaviour
 {
@@ -19,12 +21,18 @@ public class TankMovement : MonoBehaviour
     private Rigidbody m_Rigidbody;         
     private float m_MovementInputValue;    
     private float m_TurnInputValue;        
-    private float m_OriginalPitch;         
+    private float m_OriginalPitch;
 
+
+    //Variables for using path using waypoints.
+    public Transform[] waypoints;
+    private int destPoint = 0;
+    private NavMeshAgent agent;
 
     private void Awake()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
+        agent = GetComponent<NavMeshAgent>();
     }
 
 
@@ -44,8 +52,36 @@ public class TankMovement : MonoBehaviour
 
     private void Start()
     {
-        m_MovementAxisName = "Vertical" + m_PlayerNumber;
-        m_TurnAxisName = "Horizontal" + m_PlayerNumber;
+        
+         if (this.m_PlayerNumber == 1)
+         {
+            //code for movement using navmesh patrol
+
+            //create a new array with name tagg in order, so we can do the path as we want.
+
+            GameObject[] gos = GameObject.FindGameObjectsWithTag("WayPoint").OrderBy(go => go.name).ToArray();
+
+            //Set transform vector = length of the sorted array
+
+            waypoints = new Transform[gos.Length];
+
+            for (int i = 0; i < gos.Length; i++)
+            {
+                //Assign transform of the vector of gameobjects sets as waypoints to the vector of transform.
+                waypoints[i] = gos[i].transform;
+            }
+
+            agent.autoBraking = false;
+
+            GoNextWayPoit();
+        }
+        else if (this.m_PlayerNumber == 2)
+        {
+            //code for movement using wander
+        }
+
+        /*m_MovementAxisName = "Vertical" + m_PlayerNumber;
+        m_TurnAxisName = "Horizontal" + m_PlayerNumber;*/
 
         m_OriginalPitch = m_MovementAudio.pitch;
     }
@@ -53,9 +89,11 @@ public class TankMovement : MonoBehaviour
 
     private void Update()
     {
+        
+
         // Store the player's input and make sure the audio for the engine is playing.
-        m_MovementInputValue = Input.GetAxis (m_MovementAxisName);
-        m_TurnInputValue = Input.GetAxis(m_TurnAxisName);
+        /*m_MovementInputValue = Input.GetAxis (m_MovementAxisName);
+        m_TurnInputValue = Input.GetAxis(m_TurnAxisName);*/
 
         EngineAudio();
     }
@@ -91,20 +129,33 @@ public class TankMovement : MonoBehaviour
     {
         // Move and turn the tank.
         Move();
-        Turn();
+        //Turn();
     }
 
 
     private void Move()
     {
+        if (this.m_PlayerNumber == 1)
+        {
+            //code for movement using navmesh patrol
+            if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                GoNextWayPoit();
+        }
+        else if(this.m_PlayerNumber == 2)
+        {
+            //code for movement using wander
+        }
+         
+
         // Adjust the position of the tank based on the player's input.
-        Vector3 movement = transform.forward * m_MovementInputValue * m_Speed * Time.deltaTime;
-        m_Rigidbody.MovePosition(m_Rigidbody.position + movement);
+
+        /*Vector3 movement = transform.forward * m_MovementInputValue * m_Speed * Time.deltaTime;
+        m_Rigidbody.MovePosition(m_Rigidbody.position + movement);*/
 
     }
 
 
-    private void Turn()
+    /*private void Turn()
     {
         // Adjust the rotation of the tank based on the player's input.
         float turn = m_TurnInputValue * m_TurnSpeed * Time.deltaTime;
@@ -112,5 +163,18 @@ public class TankMovement : MonoBehaviour
         Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
 
         m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
+    }*/
+
+    void GoNextWayPoit() // code for going to next Waypoint
+    {
+        if (waypoints.Length == 0)
+        {
+            return;
+        }
+
+        agent.destination = waypoints[destPoint].position;
+
+        destPoint = (destPoint + 1) % waypoints.Length;
+
     }
 }
