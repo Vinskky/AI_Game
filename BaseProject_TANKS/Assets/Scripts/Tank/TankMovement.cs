@@ -41,6 +41,7 @@ public class TankMovement : MonoBehaviour
     private Transform[] waypoints;
     private int destPoint = 0;
     private NavMeshAgent agent;
+    private Vector3 waypointPos;
 
     //Private variables for using SteeringSeek
     private float turnSpeed;
@@ -50,7 +51,7 @@ public class TankMovement : MonoBehaviour
     private Vector3 position;
     private Quaternion rot;
     private Vector3 wTarget;
-    private int n = 0;
+    private float timer = 0;
 
     private void Awake()
     {
@@ -96,7 +97,7 @@ public class TankMovement : MonoBehaviour
 
             agent.autoBraking = false;
 
-            GoNextWayPoit();
+            GoNextWayPoint();
         }
         else if (this.m_PlayerNumber == 2)
         {
@@ -164,8 +165,11 @@ public class TankMovement : MonoBehaviour
         if (this.m_PlayerNumber == 1)
         {
             //code for movement using navmesh patrol
-            if (!agent.pathPending && agent.remainingDistance < 0.5f)
-                GoNextWayPoit();
+
+            if ( Vector3.Distance(transform.position, waypointPos) < 2.0f)
+                GoNextWayPoint();
+
+            SteeringSeek(waypointPos);
         }
         else if(this.m_PlayerNumber == 2)
         {
@@ -195,14 +199,14 @@ public class TankMovement : MonoBehaviour
         m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
     }*/
 
-    void GoNextWayPoit() // code for going to next Waypoint
+    void GoNextWayPoint() // code for going to next Waypoint
     {
         if (waypoints.Length == 0)
         {
             return;
         }
 
-        agent.destination = waypoints[destPoint].position;
+        waypointPos = waypoints[destPoint].position;
 
         destPoint = (destPoint + 1) % waypoints.Length;
 
@@ -225,8 +229,11 @@ public class TankMovement : MonoBehaviour
         if (Vector3.Distance(targetPos, position) < stopDistance)
             return;
 
-        if (n % 5 == 0)
+        if (timer > 0.5)
+        {
             Seek(targetPos);
+        }
+
 
         turnSpeed += turnAcceleration * Time.deltaTime;
         turnSpeed = Mathf.Min(turnSpeed, maxTurnSpeed);
@@ -244,12 +251,14 @@ public class TankMovement : MonoBehaviour
         rot = Quaternion.Slerp(rot, rotation, Time.deltaTime * turnSpeed);
         position += transform.forward.normalized * movSpeed * Time.deltaTime;
 
-        if (n % 5 == 0)
+        if (timer > 0.5)
         {
             agent.destination = position;
-            transform.rotation = rot;
+            timer = 0;
         }
+        transform.rotation = rot;
 
+        timer += Time.smoothDeltaTime;
     }
 
     void Seek(Vector3 targetPos)
