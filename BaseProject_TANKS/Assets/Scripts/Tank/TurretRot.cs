@@ -5,7 +5,7 @@ using UnityEngine;
 public class TurretRot : MonoBehaviour
 {
     private GameObject target;
-    private float rotationSpeed;
+    public float rotationSpeed = 1.5f;
 
     private Quaternion lookRotation;
     private Vector3 direction;
@@ -20,8 +20,6 @@ public class TurretRot : MonoBehaviour
                 target = go.gameObject;
             }
         }
-
-        rotationSpeed = 1.5f;
     }
 
     // Update is called once per frame
