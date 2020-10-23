@@ -6,9 +6,10 @@ public class TurretRot : MonoBehaviour
 {
     private GameObject target;
     private float rotationSpeed;
-
+    
     private Quaternion lookRotation;
     private Vector3 direction;
+   
     // Start is called before the first frame update
     void Start()
     {
@@ -19,9 +20,11 @@ public class TurretRot : MonoBehaviour
             {
                 target = go.gameObject;
             }
+           
         }
 
         rotationSpeed = 1.5f;
+       
     }
 
     // Update is called once per frame
@@ -32,5 +35,7 @@ public class TurretRot : MonoBehaviour
         lookRotation = Quaternion.LookRotation(direction);
 
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+
+        
     }
 }
