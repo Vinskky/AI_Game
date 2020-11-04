@@ -42,9 +42,8 @@ public class TankShooting : MonoBehaviour
 
         if(rechargeTimer > m_rechargeTime)
         {
-            float maxRange = (m_LaunchForce * m_LaunchForce) / gravity;
 
-            if (Mathf.Abs(Vector3.Distance(target.transform.position, transform.position)) < maxRange)
+            if (Mathf.Abs(Vector3.Distance(target.transform.position, transform.position)) < ((m_LaunchForce * m_LaunchForce) / gravity))
             {
                 Fire();
             }
@@ -61,7 +60,7 @@ public class TankShooting : MonoBehaviour
         // Instantiate and launch the shell.
 
         shootAngle = 0.5f * (Mathf.Rad2Deg*Mathf.Asin((gravity * Mathf.Abs(Vector3.Distance(target.transform.position, transform.position))) / (m_LaunchForce * m_LaunchForce)));
-        m_FireTransform.localEulerAngles.Set(m_FireTransform.localEulerAngles.x, shootAngle, m_FireTransform.localEulerAngles.z);
+        m_FireTransform.localEulerAngles = new Vector3(360- shootAngle, m_FireTransform.localEulerAngles.y, m_FireTransform.localEulerAngles.z);
 
         //Vector3 eulerTransform = m_FireTransform.rotation.eulerAngles;
         //Vector3 finalEulerTransform = new Vector3(eulerTransform.x, shootAngle, eulerTransform.z);

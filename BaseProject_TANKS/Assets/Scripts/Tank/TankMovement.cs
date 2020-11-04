@@ -18,12 +18,10 @@ public class TankMovement : MonoBehaviour
     
     private string m_MovementAxisName;     
     private string m_TurnAxisName;         
-    private Rigidbody m_Rigidbody;         
-    private float m_MovementInputValue;    
-    private float m_TurnInputValue;        
+    private Rigidbody m_Rigidbody;                
     private float m_OriginalPitch;
 
-    //Public varuables for using SteeringSeek
+    //Public variables for using SteeringSeek
     [Header("Seek Parameters")]
     public float stopDistance = 2.0f;
     public float slowDistance = 4.0f;
@@ -32,7 +30,7 @@ public class TankMovement : MonoBehaviour
     public float acceleration = 2.0f;
     public float turnAcceleration = 2.0f;
 
-    //Public varuables for using SteeringSeek
+    //Public variables for using Wander
     [Header("Wander Parameters")]
     public float wanderRadius = 2f;
     public float wanderOffset = 3f;
@@ -53,6 +51,9 @@ public class TankMovement : MonoBehaviour
     private Vector3 wTarget;
     private float timer = 0;
 
+    //Private variables for using Wander
+    private Collider[] obstacles;
+
     private void Awake()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
@@ -63,8 +64,6 @@ public class TankMovement : MonoBehaviour
     private void OnEnable ()
     {
         m_Rigidbody.isKinematic = false;
-        m_MovementInputValue = 0f;
-        m_TurnInputValue = 0f;
     }
 
 
@@ -102,6 +101,15 @@ public class TankMovement : MonoBehaviour
         else if (this.m_PlayerNumber == 2)
         {
             //code for movement using wander
+            GameObject[] gos = GameObject.FindGameObjectsWithTag("Obstacles").ToArray();
+
+            obstacles = new Collider[gos.Length];
+
+            for (int i = 0; i < gos.Length; i++)
+            {
+                obstacles[i] = gos[i].GetComponent<Collider>();
+            }
+
             position = transform.position;
             Wander();
             Move();
@@ -221,6 +229,16 @@ public class TankMovement : MonoBehaviour
         Vector3 worldTarget = transform.TransformPoint(localTarget);
         worldTarget.y = 0f;
 
+        for (int i = 0; i < obstacles.Length; i++)
+        {
+            if (obstacles[i].bounds.Contains(worldTarget))
+            {
+                worldTarget = -transform.position * 0.1f;
+
+            };
+        }
+
+       
         wTarget = worldTarget;
     }
 
