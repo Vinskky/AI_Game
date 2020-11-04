@@ -36,10 +36,8 @@ public class TankMovement : MonoBehaviour
     public float wanderOffset = 3f;
 
     //Variables for using path using waypoints.
-    private Transform[] waypoints;
-    private int destPoint = 0;
     private NavMeshAgent agent;
-    private Vector3 waypointPos;
+    private GameObject ghost;
 
     //Private variables for using SteeringSeek
     private float turnSpeed;
@@ -76,27 +74,10 @@ public class TankMovement : MonoBehaviour
     private void Start()
     {
         
-         if (this.m_PlayerNumber == 1)
-         {
-            //code for movement using navmesh patrol
-
-            //create a new array with name tagg in order, so we can do the path as we want.
-
-            GameObject[] gos = GameObject.FindGameObjectsWithTag("WayPoint").OrderBy(go => go.name).ToArray();
-
-            //Set transform vector = length of the sorted array
-
-            waypoints = new Transform[gos.Length];
-
-            for (int i = 0; i < gos.Length; i++)
-            {
-                //Assign transform of the vector of gameobjects sets as waypoints to the vector of transform.
-                waypoints[i] = gos[i].transform;
-            }
-
-            agent.autoBraking = false;
-
-            GoNextWayPoint();
+        if (this.m_PlayerNumber == 1)
+        {
+            //Assign object target to follow (ghost object)
+            ghost = GameObject.Find("Ghost");
         }
         else if (this.m_PlayerNumber == 2)
         {
@@ -172,12 +153,8 @@ public class TankMovement : MonoBehaviour
     {
         if (this.m_PlayerNumber == 1)
         {
-            //code for movement using navmesh patrol
-
-            if ( Vector3.Distance(transform.position, waypointPos) < 2.0f)
-                GoNextWayPoint();
-
-            SteeringSeek(waypointPos);
+            //code for movement following ghost
+            SteeringSeek(ghost.transform.position);
         }
         else if(this.m_PlayerNumber == 2)
         {
@@ -206,19 +183,6 @@ public class TankMovement : MonoBehaviour
 
         m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
     }*/
-
-    void GoNextWayPoint() // code for going to next Waypoint
-    {
-        if (waypoints.Length == 0)
-        {
-            return;
-        }
-
-        waypointPos = waypoints[destPoint].position;
-
-        destPoint = (destPoint + 1) % waypoints.Length;
-
-    }
 
     void Wander() //
     {
