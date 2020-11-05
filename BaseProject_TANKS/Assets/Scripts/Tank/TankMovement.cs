@@ -35,6 +35,13 @@ public class TankMovement : MonoBehaviour
     public float wanderRadius = 2f;
     public float wanderOffset = 3f;
 
+    //Debug
+    private LineRenderer circle;
+    [Header("Wander Debug Parameters")]
+    [Range(0, 50)]
+    public int circle_segments = 50;
+    private GameObject wanderWaypoint;
+
     //Variables for using path using waypoints.
     private NavMeshAgent agent;
     private GameObject ghost;
@@ -73,23 +80,33 @@ public class TankMovement : MonoBehaviour
 
     private void Start()
     {
-        
+        circle = this.GetComponent<LineRenderer>();
+        circle.enabled = false;
+
         if (this.m_PlayerNumber == 1)
         {
             //Assign object target to follow (ghost object)
             ghost = GameObject.Find("Ghost");
+            
         }
         else if (this.m_PlayerNumber == 2)
         {
             //code for movement using wander
             GameObject[] gos = GameObject.FindGameObjectsWithTag("Obstacles").ToArray();
-
+            
             obstacles = new Collider[gos.Length];
 
             for (int i = 0; i < gos.Length; i++)
             {
                 obstacles[i] = gos[i].GetComponent<Collider>();
             }
+
+            circle.positionCount = circle_segments + 1;
+            circle.useWorldSpace = false;
+            circle.startWidth = 0.1f;
+            circle.endWidth = 0.1f;
+
+            wanderWaypoint = GameObject.Find("WanderWaypoint");
 
             position = transform.position;
             Wander();
@@ -105,8 +122,15 @@ public class TankMovement : MonoBehaviour
 
     private void Update()
     {
-        
 
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            if (this.m_PlayerNumber == 2)
+            {
+                circle.enabled = !circle.enabled;
+                wanderWaypoint.GetComponent<Renderer>().enabled = !wanderWaypoint.GetComponent<Renderer>().enabled;
+            }
+        }
         // Store the player's input and make sure the audio for the engine is playing.
         /*m_MovementInputValue = Input.GetAxis (m_MovementAxisName);
         m_TurnInputValue = Input.GetAxis(m_TurnAxisName);*/
@@ -195,14 +219,21 @@ public class TankMovement : MonoBehaviour
 
         for (int i = 0; i < obstacles.Length; i++)
         {
-            if (obstacles[i].bounds.Contains(worldTarget))
+            while (obstacles[i].bounds.Contains(worldTarget))
             {
-                worldTarget = -transform.position * 0.1f;
+                localTarget = new Vector3(UnityEngine.Random.Range(-1.0f, 1.0f), 0, UnityEngine.Random.Range(-1.0f, 1.0f));
+                localTarget.Normalize();
+                localTarget *= wanderRadius;
+                localTarget += new Vector3(0, 0, wanderOffset);
+                worldTarget = transform.TransformPoint(localTarget);
+                worldTarget.y = 0f;
 
             };
         }
 
-       
+        DebugCircle(wanderRadius);
+        wanderWaypoint.transform.position = worldTarget;
+
         wTarget = worldTarget;
     }
 
@@ -251,5 +282,24 @@ public class TankMovement : MonoBehaviour
         movement = direction.normalized * acceleration;
         float angle = Mathf.Rad2Deg * Mathf.Atan2(movement.x, movement.z);
         rotation = Quaternion.AngleAxis(angle, Vector3.up);
+    }
+
+
+    void DebugCircle(float radius)
+    {
+        float x;
+        float z;
+
+        float angle = 20f;
+
+        for (int i = 0; i < (circle_segments + 1); i++)
+        {
+            x = Mathf.Sin(Mathf.Deg2Rad * angle) * radius;
+            z = Mathf.Cos(Mathf.Deg2Rad * angle) * radius;
+
+            circle.SetPosition(i, new Vector3(x, 0, z + wanderOffset));
+
+            angle += (360f / circle_segments);
+        }
     }
 }

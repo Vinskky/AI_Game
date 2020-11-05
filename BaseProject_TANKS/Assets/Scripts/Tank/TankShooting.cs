@@ -2,6 +2,7 @@
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.UI;
 
+
 public class TankShooting : MonoBehaviour
 {
     public int m_PlayerNumber = 1;       
@@ -40,7 +41,22 @@ public class TankShooting : MonoBehaviour
     {
         // Track the current state of the fire button and make decisions based on the current launch force.
 
-        if(rechargeTimer > m_rechargeTime)
+        RaycastHit ray;
+
+        Vector3 origin = transform.position;
+        origin.y = 2;
+
+        Vector3 final = target.transform.position;
+        final.y = 2;
+
+        Vector3 direction = new Vector3(0.0f, 0.0f, 0.0f);
+        direction = final - origin;
+        direction.Normalize();
+
+        Physics.Raycast(origin, direction, out ray, Mathf.Abs(Vector3.Distance(origin, final)));
+        Debug.DrawLine(origin, final, Color.red);
+
+        if (rechargeTimer > m_rechargeTime && ray.collider == null)
         {
 
             if (Mathf.Abs(Vector3.Distance(target.transform.position, transform.position)) < ((m_LaunchForce * m_LaunchForce) / gravity))

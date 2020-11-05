@@ -31,10 +31,10 @@ public class Patrol : MonoBehaviour
 
         agent.autoBraking = false;
 
-        GoNextWayPoit();
+        GoNextWayPoint();
     }
 
-    void GoNextWayPoit()
+    void GoNextWayPoint()
     {
         if (waypoints.Length == 0)
         {
@@ -50,7 +50,18 @@ public class Patrol : MonoBehaviour
     void Update()
     {
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
-            GoNextWayPoit();
+            GoNextWayPoint();
+
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            for (int i = 0; i < waypoints.Length; i++)
+            {
+                //Assign transform of the vector of gameobjects sets as waypoints to the vector of transform.
+                waypoints[i].GetComponent<Renderer>().enabled = !waypoints[i].GetComponent<Renderer>().enabled;
+            }
+
+            this.GetComponent<Renderer>().enabled = !this.GetComponent<Renderer>().enabled;
+        }
     }
 
   
