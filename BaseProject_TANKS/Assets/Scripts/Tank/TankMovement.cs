@@ -7,17 +7,12 @@ using System.Linq; // sort array for waypoints
 
 public class TankMovement : MonoBehaviour
 {
-    public int m_PlayerNumber = 1;         
-    public float m_Speed = 12f;            
-    public float m_TurnSpeed = 180f;       
+    public int m_PlayerNumber = 1;                  
     public AudioSource m_MovementAudio;    
     public AudioClip m_EngineIdling;       
     public AudioClip m_EngineDriving;      
     public float m_PitchRange = 0.2f;
-
-    
-    private string m_MovementAxisName;     
-    private string m_TurnAxisName;         
+     
     private Rigidbody m_Rigidbody;                
     private float m_OriginalPitch;
 
