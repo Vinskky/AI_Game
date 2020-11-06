@@ -81,7 +81,7 @@ public class TankMovement : MonoBehaviour
         if (this.m_PlayerNumber == 1)
         {
             //Assign object target to follow (ghost object)
-            ghost = GameObject.Find("Ghost");
+            ghost = GameObject.Find("Ghost(Clone)");
             
         }
         else if (this.m_PlayerNumber == 2)
