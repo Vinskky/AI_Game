@@ -222,7 +222,6 @@ public class TankMovement : MonoBehaviour
                 localTarget += new Vector3(0, 0, wanderOffset);
                 worldTarget = transform.TransformPoint(localTarget);
                 worldTarget.y = 0f;
-
             };
         }
 
@@ -271,7 +270,6 @@ public class TankMovement : MonoBehaviour
 
     void Seek(Vector3 targetPos)
     {
-
         Vector3 direction = targetPos - position;
         direction.y = 0f;
         movement = direction.normalized * acceleration;
@@ -285,7 +283,7 @@ public class TankMovement : MonoBehaviour
         float x;
         float z;
 
-        float angle = 20f;
+        float angle = 20.0f;
 
         for (int i = 0; i < (circle_segments + 1); i++)
         {
@@ -294,7 +292,7 @@ public class TankMovement : MonoBehaviour
 
             circle.SetPosition(i, new Vector3(x, 0, z + wanderOffset));
 
-            angle += (360f / circle_segments);
+            angle += (360.0f / circle_segments);
         }
     }
 }
