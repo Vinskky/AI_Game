@@ -9,7 +9,7 @@ using System.Linq;
 public class Patrol : MonoBehaviour
 {
     private Transform[] waypoints;
-    private int destPoint = 0;
+    public int destPoint = 0;
     private NavMeshAgent agent;
     // Start is called before the first frame update
     void Start()

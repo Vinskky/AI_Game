@@ -11,8 +11,10 @@ public class GameManager : MonoBehaviour
     public CameraControl m_CameraControl;   
     public Text m_MessageText;              
     public GameObject m_TankPrefab;         
-    public TankManager[] m_Tanks;           
+    public TankManager[] m_Tanks;
 
+    public GameObject m_GhostPrefab;
+    public GhostManager m_Ghosts;
 
     private int m_RoundNumber;              
     private WaitForSeconds m_StartWait;     
@@ -42,6 +44,9 @@ public class GameManager : MonoBehaviour
             m_Tanks[i].m_PlayerNumber = i + 1;
             m_Tanks[i].Setup();
         }
+
+        m_Ghosts.m_Instance = Instantiate(m_GhostPrefab, m_Ghosts.m_SpawnPoint.position, m_Ghosts.m_SpawnPoint.rotation) as GameObject;
+        m_Ghosts.Setup();
     }
 
 
@@ -186,6 +191,7 @@ public class GameManager : MonoBehaviour
         {
             m_Tanks[i].Reset();
         }
+        m_Ghosts.Reset();
     }
 
 
@@ -195,6 +201,7 @@ public class GameManager : MonoBehaviour
         {
             m_Tanks[i].EnableControl();
         }
+        m_Ghosts.EnableControl();
     }
 
 
@@ -204,5 +211,6 @@ public class GameManager : MonoBehaviour
         {
             m_Tanks[i].DisableControl();
         }
+        m_Ghosts.DisableControl();
     }
 }
