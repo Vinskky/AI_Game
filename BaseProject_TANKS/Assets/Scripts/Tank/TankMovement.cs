@@ -108,9 +108,6 @@ public class TankMovement : MonoBehaviour
             Move();
         }
 
-        /*m_MovementAxisName = "Vertical" + m_PlayerNumber;
-        m_TurnAxisName = "Horizontal" + m_PlayerNumber;*/
-
         m_OriginalPitch = m_MovementAudio.pitch;
     }
     
@@ -126,10 +123,6 @@ public class TankMovement : MonoBehaviour
                 wanderWaypoint.GetComponent<Renderer>().enabled = !wanderWaypoint.GetComponent<Renderer>().enabled;
             }
         }
-        // Store the player's input and make sure the audio for the engine is playing.
-        /*m_MovementInputValue = Input.GetAxis (m_MovementAxisName);
-        m_TurnInputValue = Input.GetAxis(m_TurnAxisName);*/
-
         EngineAudio();
     }
 
@@ -137,7 +130,6 @@ public class TankMovement : MonoBehaviour
     private void EngineAudio()
     {
         // Play the correct audio clip based on whether or not the tank is moving and what audio is currently playing.
-
         if(Mathf.Abs(transform.position.x - agent.destination.x) < stopDistance && Mathf.Abs(transform.position.z - agent.destination.z) < stopDistance)
         {
             if(m_MovementAudio.clip == m_EngineDriving)
@@ -162,9 +154,8 @@ public class TankMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Move and turn the tank.
+        // Move the tank.
         Move();
-        //Turn();
     }
 
 
@@ -172,7 +163,7 @@ public class TankMovement : MonoBehaviour
     {
         if (this.m_PlayerNumber == 1)
         {
-            //code for movement following ghost
+            //SteeringSeek to following the ghost and allow a smooth path patrol
             SteeringSeek(ghost.transform.position);
         }
         else if(this.m_PlayerNumber == 2)
@@ -183,28 +174,11 @@ public class TankMovement : MonoBehaviour
 
             SteeringSeek(wTarget);
         }
-         
-
-        // Adjust the position of the tank based on the player's input.
-
-        /*Vector3 movement = transform.forward * m_MovementInputValue * m_Speed * Time.deltaTime;
-        m_Rigidbody.MovePosition(m_Rigidbody.position + movement);*/
-
     }
 
-
-    /*private void Turn()
+    void Wander()
     {
-        // Adjust the rotation of the tank based on the player's input.
-        float turn = m_TurnInputValue * m_TurnSpeed * Time.deltaTime;
-
-        Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
-
-        m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
-    }*/
-
-    void Wander() //
-    {
+        //Select a random point inside circle to set as target and move to it.
         Vector3 localTarget = new Vector3(UnityEngine.Random.Range(-1.0f, 1.0f), 0, UnityEngine.Random.Range(-1.0f, 1.0f));
         localTarget.Normalize();
         localTarget *= wanderRadius;
@@ -212,6 +186,7 @@ public class TankMovement : MonoBehaviour
         Vector3 worldTarget = transform.TransformPoint(localTarget);
         worldTarget.y = 0f;
 
+        //check if the point its inside the obstacles to set a better point to move.
         for (int i = 0; i < obstacles.Length; i++)
         {
             while (obstacles[i].bounds.Contains(worldTarget))
@@ -236,6 +211,7 @@ public class TankMovement : MonoBehaviour
         if (Vector3.Distance(targetPos, position) < stopDistance)
             return;
 
+        //seek delay so it does not iterate every frame
         if (timer > 0.5)
         {
             Seek(targetPos);
@@ -244,9 +220,10 @@ public class TankMovement : MonoBehaviour
 
         turnSpeed += turnAcceleration * Time.deltaTime;
         turnSpeed = Mathf.Min(turnSpeed, maxTurnSpeed);
-
+ 
         if (Vector3.Distance(targetPos, position) < slowDistance)
         {
+            //slows movement when arriving destination
             movSpeed = (maxSpeed * Vector3.Distance(targetPos, position)) / slowDistance;
         }
         else
@@ -277,7 +254,7 @@ public class TankMovement : MonoBehaviour
         rotation = Quaternion.AngleAxis(angle, Vector3.up);
     }
 
-
+    //Debug method for wander circle
     void DebugCircle(float radius)
     {
         float x;

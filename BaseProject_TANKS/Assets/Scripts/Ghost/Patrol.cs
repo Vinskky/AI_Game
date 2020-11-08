@@ -15,11 +15,9 @@ public class Patrol : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        //create a new array with name tagg in order, so we can do the path as we want.
 
+        //create a new array with name tagg in order, so we can do the path as we want.
         GameObject[] gos = GameObject.FindGameObjectsWithTag("WayPoint").OrderBy(go => go.name).ToArray();
-        
-        //Set transform vector = length of the sorted array
 
         waypoints = new Transform[gos.Length];
 
@@ -54,9 +52,9 @@ public class Patrol : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.D))
         {
+            //enable /disable renderer component of way point and ghost for debug mode
             for (int i = 0; i < waypoints.Length; i++)
             {
-                //Assign transform of the vector of gameobjects sets as waypoints to the vector of transform.
                 waypoints[i].GetComponent<Renderer>().enabled = !waypoints[i].GetComponent<Renderer>().enabled;
             }
 
