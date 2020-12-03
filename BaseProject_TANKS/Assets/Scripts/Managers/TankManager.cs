@@ -14,6 +14,7 @@ public class TankManager
 
     private TankMovement m_Movement;       
     private TankShooting m_Shooting;
+    private BehaviorExecutor m_BExecutor;
     private GameObject m_CanvasGameObject;
 
 
@@ -21,10 +22,13 @@ public class TankManager
     {
         m_Movement = m_Instance.GetComponent<TankMovement>();
         m_Shooting = m_Instance.GetComponent<TankShooting>();
+        m_BExecutor = m_Instance.GetComponent<BehaviorExecutor>();
         m_CanvasGameObject = m_Instance.GetComponentInChildren<Canvas>().gameObject;
 
         m_Movement.m_PlayerNumber = m_PlayerNumber;
         m_Shooting.m_PlayerNumber = m_PlayerNumber;
+        m_BExecutor.SetBehaviorParam("Player", m_PlayerNumber);
+        m_Instance.tag = m_PlayerNumber.ToString();
 
         m_ColoredPlayerText = "<color=#" + ColorUtility.ToHtmlStringRGB(m_PlayerColor) + ">PLAYER " + m_PlayerNumber + "</color>";
 
@@ -48,8 +52,8 @@ public class TankManager
 
     public void EnableControl()
     {
-        m_Movement.enabled = true;
-        m_Shooting.enabled = true;
+        //m_Movement.enabled = true;
+        //m_Shooting.enabled = true;
 
         m_CanvasGameObject.SetActive(true);
     }

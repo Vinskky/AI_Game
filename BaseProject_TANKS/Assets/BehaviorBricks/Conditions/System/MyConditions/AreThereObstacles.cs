@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 
 using Pada1.BBCore.Framework;
 using Pada1.BBCore;
@@ -7,12 +8,18 @@ using Pada1.BBCore;
 [Help("Checks whether there are obstacles between this tank and the enemy through a raycast.")]
 public class AreThereObstacles : ConditionBase
 {
+    ///<value>Input Enemy Tank.</value>
+    [InParam("Enemy")]
+    [Help("Enemy tank")]
+    public GameObject enemy;
+
+    ///<value>Input Agent Tank.</value>
+    [InParam("Agent")]
+    [Help("Agent tank")]
+    public GameObject agent;
+
     public override bool Check()
     {
-
-        GameObject enemy = GameObject.Find("Enemy");
-        GameObject agent = GameObject.Find("Agent");
-
         RaycastHit ray;
 
         Vector3 origin = agent.transform.position;
