@@ -61,5 +61,6 @@ sysinfo.txt
 crashlytics-build.properties
 
 !Tank.asset
+!Tank.asset.meta
 
 BaseProject_TANKS/Assets/Scenes/Main/LightingData.asset
