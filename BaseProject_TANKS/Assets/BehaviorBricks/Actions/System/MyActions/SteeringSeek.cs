@@ -48,15 +48,11 @@ namespace BBUnity.Actions
         [Help("Maximum Angular Acceleration the object can reach.")]
         public float turnAcceleration = 2.0f;
 
-        ///<value>Input Enemy Tank.</value>
-        [InParam("Enemy")]
-        [Help("Enemy tank")]
-        public GameObject enemy;
+        ///<value>Input Steering Seek Timer.</value>
+        [InParam("Seek Timer")]
+        [Help("Timer that controls the frequency at which the seek variables are applied to the object.")]
+        public float timer = 0.6f;
 
-        ///<value>Input Agent Tank.</value>
-        [InParam("Agent")]
-        [Help("Agent tank")]
-        public GameObject agent;
 
         private float turnSpeed;
         private float movSpeed;
@@ -64,14 +60,12 @@ namespace BBUnity.Actions
         private Vector3 movement;
         private Vector3 position;
         private Quaternion rot;
-        private float timer = 0;
 
         /// <summary>Initialization Method of MoveToRandomPosition.</summary>
         /// <remarks>Check if there is a NavMeshAgent to assign it one by default and assign it
         /// to the NavMeshAgent the destination a random position calculated with <see cref="getRandomPosition()"/> </remarks>
         public override void OnStart()
         {
-
 
         }
         /// <summary>Method of Update of MoveToRandomPosition </summary>
@@ -105,14 +99,14 @@ namespace BBUnity.Actions
             }
 
             rot = Quaternion.Slerp(rot, rotation, Time.deltaTime * turnSpeed);
-            position += enemy.transform.forward.normalized * movSpeed * Time.deltaTime;
+            position += gameObject.transform.forward.normalized * movSpeed * Time.deltaTime;
 
             if (timer > 0.5)
             {
-                agent.GetComponent<NavMeshAgent>().destination = position;
+                gameObject.GetComponent<NavMeshAgent>().destination = position;
                 timer = 0;
             }
-            agent.transform.rotation = rot;
+            gameObject.transform.rotation = rot;
 
             timer += Time.smoothDeltaTime;
 

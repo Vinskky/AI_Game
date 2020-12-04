@@ -37,18 +37,9 @@ namespace BBUnity.Actions
         [Help("Force at which the shell will be launched.")]
         public float m_LaunchForce;
 
-        ///<value>Input Enemy Tank.</value>
-        [InParam("Enemy")]
-        [Help("Enemy tank")]
-        public GameObject enemy;
-
-        ///<value>Input Agent Tank.</value>
-        [InParam("Agent")]
-        [Help("Agent tank")]
-        public GameObject agent;
-
         private float shootAngle = 0;
         private float gravity = 9.81f;
+        private GameObject enemy;
 
         /// <summary>Initialization Method of MoveToRandomPosition.</summary>
         /// <remarks>Check if there is a NavMeshAgent to assign it one by default and assign it
@@ -67,8 +58,18 @@ namespace BBUnity.Actions
 
             RaycastHit ray;
 
-            Vector3 origin = agent.transform.position;
+            Vector3 origin = gameObject.transform.position;
             origin.y = 2;
+
+
+            GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[]; //will return an array of all GameObjects in the scene
+            foreach (GameObject go in gos)
+            {
+                if (go.layer == 9 && go != gameObject && go.name != "FireTransform")
+                {
+                    enemy = go.gameObject;
+                }
+            }
 
             Vector3 final = enemy.transform.position;
             final.y = 2;
@@ -88,12 +89,9 @@ namespace BBUnity.Actions
 
         private void Fire()
         {
-            GameObject enemy = GameObject.Find("Enemy");
-            GameObject agent = GameObject.Find("Agent");
-
             // Instantiate and launch the shell.
 
-            shootAngle = 0.5f * (Mathf.Rad2Deg * Mathf.Asin((gravity * Mathf.Abs(Vector3.Distance(enemy.transform.position, agent.transform.position))) / (m_LaunchForce * m_LaunchForce)));
+            shootAngle = 0.5f * (Mathf.Rad2Deg * Mathf.Asin((gravity * Mathf.Abs(Vector3.Distance(enemy.transform.position, gameObject.transform.position))) / (m_LaunchForce * m_LaunchForce)));
             m_FireTransform.localEulerAngles = new Vector3(360 - shootAngle, m_FireTransform.localEulerAngles.y, m_FireTransform.localEulerAngles.z);
 
             Rigidbody shellInstance = GameObject.Instantiate(m_Shell, m_FireTransform.transform.position, m_FireTransform.transform.rotation) as Rigidbody;

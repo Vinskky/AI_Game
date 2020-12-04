@@ -28,16 +28,6 @@ namespace BBUnity.Actions
         [Help("Distance from the object to the center of the circle where the random targets of wander can be.")]
         public float wanderOffset = 3f;
 
-        ///<value>Input Enemy Tank.</value>
-        [InParam("Enemy")]
-        [Help("Enemy tank")]
-        public GameObject enemy;
-
-        ///<value>Input Agent Tank.</value>
-        [InParam("Agent")]
-        [Help("Agent tank")]
-        public GameObject agent;
-
         ///<value>Output Target Position.</value>
         [OutParam("Target Position")]
         [Help("Position to reach")]
@@ -48,8 +38,6 @@ namespace BBUnity.Actions
         [Range(0, 50)]
         private int circle_segments = 50;
         
-        
-        
         private GameObject wanderWaypoint;
         private Collider[] obstacles;
         private Vector3 position;
@@ -59,7 +47,7 @@ namespace BBUnity.Actions
         /// to the NavMeshAgent the destination a random position calculated with <see cref="getRandomPosition()"/> </remarks>
         public override void OnStart()
         {
-            circle = agent.GetComponent<LineRenderer>();
+            circle = gameObject.GetComponent<LineRenderer>();
             circle.enabled = false;
 
             //code for movement using wander
@@ -79,7 +67,7 @@ namespace BBUnity.Actions
 
             wanderWaypoint = GameObject.Find("WanderWaypoint");
 
-            position = agent.transform.position;
+            position = gameObject.transform.position;
             DoWander();
         }
         /// <summary>Method of Update of MoveToRandomPosition </summary>
@@ -94,7 +82,7 @@ namespace BBUnity.Actions
                     wanderWaypoint.GetComponent<Renderer>().enabled = !wanderWaypoint.GetComponent<Renderer>().enabled;
             }
 
-            if (Vector3.Distance(targetPos, agent.transform.position) < stopDistance)
+            if (Vector3.Distance(targetPos, gameObject.transform.position) < stopDistance)
                 DoWander();
 
             return TaskStatus.COMPLETED;
@@ -108,7 +96,7 @@ namespace BBUnity.Actions
             localTarget.Normalize();
             localTarget *= wanderRadius;
             localTarget += new Vector3(0, 0, wanderOffset);
-            Vector3 worldTarget = agent.transform.TransformPoint(localTarget);
+            Vector3 worldTarget = gameObject.transform.TransformPoint(localTarget);
             worldTarget.y = 0f;
 
             //check if the point its inside the obstacles to set a better point to move.
@@ -120,7 +108,7 @@ namespace BBUnity.Actions
                     localTarget.Normalize();
                     localTarget *= wanderRadius;
                     localTarget += new Vector3(0, 0, wanderOffset);
-                    worldTarget = agent.transform.TransformPoint(localTarget);
+                    worldTarget = gameObject.transform.TransformPoint(localTarget);
                     worldTarget.y = 0f;
                 };
             }
