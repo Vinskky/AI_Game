@@ -37,8 +37,12 @@ namespace BBUnity.Actions
         [Help("Force at which the shell will be launched.")]
         public float m_LaunchForce;
 
-        private float shootAngle = 0;
+        ///<value>Input Launch Force.</value>
+        [InParam("Gravity")]
+        [Help("Force at which the shell will be launched.")]
         private float gravity = 9.81f;
+
+        private float shootAngle = 0;
         private GameObject enemy;
 
         /// <summary>Initialization Method of MoveToRandomPosition.</summary>
@@ -81,8 +85,15 @@ namespace BBUnity.Actions
             Physics.Raycast(origin, direction, out ray, Mathf.Abs(Vector3.Distance(origin, final)));
             Debug.DrawLine(origin, final, Color.red);
 
+            if (ray.collider == null)
+            {
 
-            Fire();
+                if (Mathf.Abs(Vector3.Distance(enemy.transform.position, gameObject.transform.position)) < ((m_LaunchForce * m_LaunchForce) / gravity))
+                {
+                    Fire();
+                }
+
+            }
 
             return TaskStatus.COMPLETED;
         }

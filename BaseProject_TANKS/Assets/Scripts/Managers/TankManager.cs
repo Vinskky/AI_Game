@@ -5,28 +5,40 @@ using UnityEngine;
 public class TankManager
 {
     public Color m_PlayerColor;            
-    public Transform m_SpawnPoint;         
+    public Transform m_SpawnPoint;
+    public BBUnity.InternalBrickAsset m_TankBehaviour;
+    public Rigidbody m_Shell;
+    public AudioClip m_FireClip;
     [HideInInspector] public int m_PlayerNumber;             
     [HideInInspector] public string m_ColoredPlayerText;
     [HideInInspector] public GameObject m_Instance;          
     [HideInInspector] public int m_Wins;                     
-
-
-    private TankMovement m_Movement;       
-    private TankShooting m_Shooting;
     private BehaviorExecutor m_BExecutor;
     private GameObject m_CanvasGameObject;
+    private Transform m_FireTransform;
 
 
     public void Setup()
     {
-        m_Movement = m_Instance.GetComponent<TankMovement>();
-        m_Shooting = m_Instance.GetComponent<TankShooting>();
         m_BExecutor = m_Instance.GetComponent<BehaviorExecutor>();
         m_CanvasGameObject = m_Instance.GetComponentInChildren<Canvas>().gameObject;
+        m_BExecutor.behavior = m_TankBehaviour;
 
-        m_Movement.m_PlayerNumber = m_PlayerNumber;
-        m_Shooting.m_PlayerNumber = m_PlayerNumber;
+        m_BExecutor.SetBehaviorParam("Shell", m_Shell);
+
+        GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[]; //will return an array of all GameObjects in the scene
+        foreach (GameObject go in gos)
+        {
+            //we have to avoid FireTransform because it's inside layer player
+            if (go.layer == 9 && go.name == "FireTransform" && go.transform.parent.parent.parent.gameObject == m_Instance)
+            {
+                m_FireTransform = go.transform;
+            }
+        }
+        m_BExecutor.SetBehaviorParam("Fire Transform", m_FireTransform);
+    
+        m_BExecutor.SetBehaviorParam("Shooting Audio", m_Instance.GetComponents<AudioSource>()[1]);
+        m_BExecutor.SetBehaviorParam("Fire Clip", m_FireClip);
         m_Instance.tag = "Player " + m_PlayerNumber.ToString();
 
         m_ColoredPlayerText = "<color=#" + ColorUtility.ToHtmlStringRGB(m_PlayerColor) + ">PLAYER " + m_PlayerNumber + "</color>";
@@ -42,8 +54,7 @@ public class TankManager
 
     public void DisableControl()
     {
-        m_Movement.enabled = false;
-        m_Shooting.enabled = false;
+        m_BExecutor.enabled = false;
 
         m_CanvasGameObject.SetActive(false);
     }
@@ -51,8 +62,7 @@ public class TankManager
 
     public void EnableControl()
     {
-        //m_Movement.enabled = true;
-        //m_Shooting.enabled = true;
+        m_BExecutor.enabled = true;
 
         m_CanvasGameObject.SetActive(true);
     }

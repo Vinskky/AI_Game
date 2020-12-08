@@ -11,6 +11,7 @@ namespace BBUnity.Conditions
     {
         public override bool Check()
         {
+            Debug.Log(gameObject.CompareTag("Player 1"));
             return gameObject.CompareTag("Player 1");
         }
     }

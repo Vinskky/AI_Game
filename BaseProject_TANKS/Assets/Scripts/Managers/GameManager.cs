@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
-//using UnityEngine.SceneManagement;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,6 +17,10 @@ public class GameManager : MonoBehaviour
     public GameObject m_GhostPrefab;
     public GhostManager m_Ghosts;
 
+    public GameObject m_AmmoPrefab;
+    public int m_AmountAmmo = 4;
+    private Transform[] m_AmmoSpawnPoints;
+
     private int m_RoundNumber;              
     private WaitForSeconds m_StartWait;     
     private WaitForSeconds m_EndWait;       
@@ -25,10 +30,20 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        GameObject[] gos = GameObject.FindGameObjectsWithTag("Recharge").OrderBy(go => go.name).ToArray();
+
+        m_AmmoSpawnPoints = new Transform[gos.Length];
+
+        for (int i = 0; i < gos.Length; i++)
+        {
+            m_AmmoSpawnPoints[i] = gos[i].transform;
+        }
+
         m_StartWait = new WaitForSeconds(m_StartDelay);
         m_EndWait = new WaitForSeconds(m_EndDelay);
 
         SpawnAllTanks();
+        SpawnAllAmmo();
         SetCameraTargets();
 
         StartCoroutine(GameLoop());
@@ -47,6 +62,31 @@ public class GameManager : MonoBehaviour
 
         m_Ghosts.m_Instance = Instantiate(m_GhostPrefab, m_Ghosts.m_SpawnPoint.position, m_Ghosts.m_SpawnPoint.rotation) as GameObject;
         m_Ghosts.Setup();
+    }
+
+    private void SpawnAllAmmo()
+    {
+        int pos1 = Random.Range(0, 7);
+        int pos2 = Random.Range(0, 7);
+        int pos3 = Random.Range(0, 7);
+        int pos4 = Random.Range(0, 7);
+
+        while (pos1 == pos2 || pos1 == pos3 || pos1 == pos4)
+            pos1 = Random.Range(0, 7);
+
+        while (pos2 == pos1 || pos2 == pos3 || pos2 == pos4)
+            pos2 = Random.Range(0, 7);
+
+        while (pos3 == pos1 || pos3 == pos2 || pos3 == pos4)
+            pos3 = Random.Range(0, 7);
+
+        while (pos4 == pos1 || pos4 == pos2 || pos4 == pos3)
+            pos4 = Random.Range(0, 7);
+
+        Instantiate(m_AmmoPrefab, m_AmmoSpawnPoints[pos1].position, m_AmmoSpawnPoints[pos1].rotation);
+        Instantiate(m_AmmoPrefab, m_AmmoSpawnPoints[pos2].position, m_AmmoSpawnPoints[pos2].rotation);
+        Instantiate(m_AmmoPrefab, m_AmmoSpawnPoints[pos3].position, m_AmmoSpawnPoints[pos3].rotation);
+        Instantiate(m_AmmoPrefab, m_AmmoSpawnPoints[pos4].position, m_AmmoSpawnPoints[pos4].rotation);
     }
 
 
